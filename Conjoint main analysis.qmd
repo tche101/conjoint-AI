@@ -1,0 +1,77 @@
+```{r}
+library(tidyverse)
+library(cjoint)
+
+d_all <- read.csv('d_all.csv', stringsAsFactors = TRUE)
+d_all$role <- relevel(d_all$role, ref = 'Monitor health status and send alerts')
+d_all$FDA <- relevel(d_all$FDA, ref = 'not subject to')
+d_all$mention_human <- relevel(d_all$mention_human, ref = 'no mention similar to human')
+d_all$inc <- relevel(d_all$inc, ref = 'Less than 25k')
+
+d_us <- filter(d_all, country == 'US') %>% droplevels()
+d_cn <- filter(d_all, country == 'CN') %>% droplevels()
+```
+
+```{r}
+# Use
+amce(likely_use ~ area+severe_level+FDA+role+mention_human+price+model_type+lead_by+female+agecat+edu+inc+hispanic+white+black+native+asian+hawaiian,
+                                  data = d_us) %>% summary()
+amce(likely_use ~ area+severe_level+FDA+role+mention_human+price+model_type+lead_by+female+agecat+edu,
+                                  data = d_cn) %>% summary()
+amce(likely_use ~ area+severe_level+FDA+role+mention_human+price+model_type+lead_by+female+agecat+edu+country,
+                                  data = d_all) %>% summary()
+amce(likely_use ~ area+severe_level+FDA+role+mention_human+price+model_type+lead_by+female+agecat+edu+country+role:country,
+                                  data = d_all) %>% summary()
+```
+```{r}
+# Trust
+amce(trustworthy ~ area+severe_level+FDA+role+mention_human+price+model_type+lead_by+female+agecat+edu+inc+hispanic+white+black+native+asian+hawaiian,
+                                  data = d_us) %>% summary()
+amce(trustworthy ~ area+severe_level+FDA+role+mention_human+price+model_type+lead_by+female+agecat+edu,
+                                  data = d_cn) %>% summary()
+amce(trustworthy ~ area+severe_level+FDA+role+mention_human+price+model_type+lead_by+female+agecat+edu+country,
+                                  data = d_all) %>% summary()
+amce(trustworthy ~ area+severe_level+FDA+role+mention_human+price+model_type+lead_by+female+agecat+edu+country+role:country,
+                                  data = d_all) %>% summary()
+```
+```{r}
+# Easy
+amce(easy ~ area+severe_level+FDA+role+mention_human+price+model_type+lead_by+female+agecat+edu+inc+hispanic+white+black+native+asian+hawaiian,
+                                  data = d_us) %>% summary()
+amce(easy ~ area+severe_level+FDA+role+mention_human+price+model_type+lead_by+female+agecat+edu,
+                                  data = d_cn) %>% summary()
+amce(easy ~ area+severe_level+FDA+role+mention_human+price+model_type+lead_by+female+agecat+edu+country,
+                                  data = d_all) %>% summary()
+amce(easy ~ area+severe_level+FDA+role+mention_human+price+model_type+lead_by+female+agecat+edu+country+role:country,
+                                  data = d_all) %>% summary()
+```
+
+```{r}
+# Improve
+amce(improve ~ area+severe_level+FDA+role+mention_human+price+model_type+lead_by+female+agecat+edu+inc+hispanic+white+black+native+asian+hawaiian,
+                                  data = d_us) %>% summary()
+amce(improve ~ area+severe_level+FDA+role+mention_human+price+model_type+lead_by+female+agecat+edu,
+                                  data = d_cn) %>% summary()
+amce(improve ~ area+severe_level+FDA+role+mention_human+price+model_type+lead_by+female+agecat+edu+country,
+                                  data = d_all) %>% summary()
+amce(improve ~ area+severe_level+FDA+role+mention_human+price+model_type+lead_by+female+agecat+edu+country+role:country,
+                                  data = d_all) %>% summary()
+```
+
+```{r}
+# Other country differences
+amce(likely_use ~ area+severe_level+FDA+role+mention_human+price+model_type+lead_by+female+agecat+edu+country+price:country,
+                            data = d_all) %>% summary()
+amce(likely_use ~ area+severe_level+FDA+role+mention_human+price+model_type+lead_by+female+agecat+edu+country+FDA:country,
+                            data = d_all) %>% summary()
+amce(likely_use ~ area+severe_level+FDA+role+mention_human+price+model_type+lead_by+female+agecat+edu+country+severe_level:country,
+                            data = d_all) %>% summary()
+amce(likely_use ~ area+severe_level+FDA+role+mention_human+price+model_type+lead_by+female+agecat+edu+country+mention_human:country,
+                            data = d_all) %>% summary()
+amce(likely_use ~ area+severe_level+FDA+role+mention_human+price+model_type+lead_by+female+agecat+edu+country+model_type:country,
+                            data = d_all) %>% summary()
+amce(likely_use ~ area+severe_level+FDA+role+mention_human+price+model_type+lead_by+female+agecat+edu+country+lead_by:country,
+                            data = d_all) %>% summary()
+amce(likely_use ~ area+severe_level+FDA+role+mention_human+price+model_type+lead_by+female+agecat+edu+country+area:country,
+                            data = d_all) %>% summary()
+```

@@ -1,0 +1,78 @@
+```{r}
+library(tidyverse)
+source('process v5.1.r')
+```
+
+```{r}
+d_all <- read.csv('d_all.csv')
+d_all$countryUS <- as.numeric(d_all$country == 'US')
+d_all$area_mental <- as.numeric(d_all$area == "Mental health")
+d_all$fda_not_subject <- as.numeric(d_all$FDA == "not subject to")
+d_all$price_modlow <- as.numeric(d_all$price == "Moderately lower than")
+d_all$price_siglow <- as.numeric(d_all$price == "Significantly lower than")
+d_all$mention_similar <- as.numeric(d_all$mention_human == "mention similar to human")
+d_all$model_specialized <- as.numeric(d_all$model_type == "a specialized medical AI model")
+d_all$lead_company <- as.numeric(d_all$lead_by == "nationally renowned technology company")
+d_all$severity_moderate <- as.numeric(d_all$severe_level == "moderate")
+d_all$severity_severe <- as.numeric(d_all$severe_level == "severe")
+d_all$female <- as.numeric(d_all$female)
+d_all$age_29_39 <- as.numeric(d_all$agecat == "(29,39]")
+d_all$age_39_49 <- as.numeric(d_all$agecat == "(39,49]")
+d_all$age_49_59 <- as.numeric(d_all$agecat == "(49,59]")
+d_all$age_59_69 <- as.numeric(d_all$agecat == "(59,69]")
+d_all$age_69_100 <- as.numeric(d_all$agecat == "(69,100]")
+d_all$edu_somecollege <- as.numeric(d_all$edu == "Some College/Associate Degree")
+d_all$edu_hsgrad <- as.numeric(d_all$edu == "HS Grad")
+d_all$edu_postgrad <- as.numeric(d_all$edu == "Postgrad")
+d_all$edu_lesshs <- as.numeric(d_all$edu == "Less than HS")
+
+cov <- c(
+  "area_mental", "fda_not_subject", "price_modlow", "price_siglow",
+  "mention_similar", "model_specialized", "lead_company",
+  "severity_moderate", "severity_severe", "female", "age_29_39",
+  "age_39_49", "age_49_59", "age_59_69", "age_69_100",
+  "edu_somecollege", "edu_hsgrad", "edu_postgrad", "edu_lesshs"
+)
+
+vars <- c('likely_use', 'countryUS', 'x_active', 'trustworthy', 'easy', 'improve', cov)
+```
+
+```{r}
+# Planning
+d_planning <- filter(d_all, role %in% c('Monitor health status and send alerts',
+                                      'Design health improvement plans'))
+d_planning$x_active <- as.numeric(d_planning$role == 'Design health improvement plans')
+d_planning <- d_planning[complete.cases(d_planning[, vars]), ]
+process(data = d_planning,
+                      y = 'likely_use', x = 'x_active',
+                      m = c('trustworthy', 'easy', 'improve'),
+                      w = 'countryUS', cov = cov,
+                      model = 8, boot = 5000, hc = 2, seed = 20260826) %>% summary()
+```
+
+```{r}
+# Diagnosis
+d_diagnosis <- filter(d_all, role %in% c('Monitor health status and send alerts',
+                                      'Provide diagnostic recommendations'))
+d_diagnosis$x_active <- as.numeric(d_diagnosis$role == 'Provide diagnostic recommendations')
+d_diagnosis <- d_diagnosis[complete.cases(d_diagnosis[, vars]), ]
+process(data = d_diagnosis,
+                      y = 'likely_use', x = 'x_active',
+                      m = c('trustworthy', 'easy', 'improve'),
+                      w = 'countryUS', cov = cov,
+                      model = 8, boot = 5000, hc = 2, seed = 20260827) %>% summary()
+```
+
+```{r}
+# Treatment
+d_treatment <- filter(d_all, role %in% c('Monitor health status and send alerts',
+                                      'Deliver treatments directly'))
+d_treatment$x_active <- as.numeric(d_treatment$role == 'Deliver treatments directly')
+d_treatment <- d_treatment[complete.cases(d_treatment[, vars]), ]
+process(data = d_treatment,
+                      y = 'likely_use', x = 'x_active',
+                      m = c('trustworthy', 'easy', 'improve'),
+                      w = 'countryUS', cov = cov,
+                      model = 8, boot = 5000, hc = 2, seed = 20260828) %>% summary()
+```
+
